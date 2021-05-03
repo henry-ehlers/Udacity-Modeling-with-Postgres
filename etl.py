@@ -66,7 +66,7 @@ def process_log_file(cur, filepath):
         try:
             cur.execute(time_table_insert, list(row))
         except Error as e:
-            print("ERROR INSERTING TIME ROW:")
+            print("ERROR INSERTING TIME ROW:,")
             print(e)
 
     # load user table
