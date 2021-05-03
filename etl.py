@@ -21,7 +21,7 @@ def process_song_file(cur, filepath):
         cur.execute(song_table_insert, song_data)
     # Ensure the exectution of the insertion was succesful
     except Error as e:
-        print("Inserction of Song Data Failed - " + e)
+        print(e)
         
     # insert artist record
     # FROM: https://knowledge.udacity.com/questions/97110
@@ -34,7 +34,7 @@ def process_song_file(cur, filepath):
         cur.execute(artist_table_insert, artist_data)
     # Ensure the exectution of the insertion was succesful
     except Error as e:
-        print("Inserction of Artist Data Failed - " + e)
+        print(e)
 
 def process_log_file(cur, filepath):
     # open log file
@@ -66,11 +66,10 @@ def process_log_file(cur, filepath):
         try:
             cur.execute(time_table_insert, list(row))
         except Error as e:
-            print("ERROR INSERTING TIME ROW:,")
             print(e)
 
     # load user table
-    #user_df = 
+    user_df = df[["userId", "firstName","lastName", "level", "gender", "location"]]
 
     # insert user records
     for i, row in user_df.iterrows():
@@ -80,8 +79,12 @@ def process_log_file(cur, filepath):
     for index, row in df.iterrows():
         
         # get songid and artistid from song and artist tables
-        cur.execute(song_select, (row.song, row.artist, row.length))
-        results = cur.fetchone()
+        try:
+            cur.execute(song_select, (row.song, row.artist, row.length))
+            results = cur.fetchone()
+        except Error as e:
+            print(e)
+            results = None
         
         if results:
             songid, artistid = results
@@ -89,9 +92,11 @@ def process_log_file(cur, filepath):
             songid, artistid = None, None
 
         # insert songplay record
-        #songplay_data = 
-        cur.execute(songplay_table_insert, songplay_data)
-
+        songplay_data = (row.ts, row.userId, row.level, songid, artistid, row.sessionId, row.location, row.userAgent)
+        try:
+            cur.execute(songplay_table_insert, songplay_data)
+        except Error as e:
+            print(e)
 
 def process_data(cur, conn, filepath, func):
     # get all files matching extension from directory
