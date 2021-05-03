@@ -38,7 +38,7 @@ def process_song_file(cur, filepath):
 
 def process_log_file(cur, filepath):
     # open log file
-    df = df.read_json(filepath, lines = True) 
+    df = pd.read_json(filepath, lines = True) 
 
     # filter by NextSong action
     df = df.loc[df['page'] == 'NextSong']
@@ -63,7 +63,11 @@ def process_log_file(cur, filepath):
     time_df = pd.DataFrame(dict(zip(column_labels, time_data)))
 
     for i, row in time_df.iterrows():
-        cur.execute(time_table_insert, list(row))
+        try:
+            cur.execute(time_table_insert, list(row))
+        except Error as e:
+            print("ERROR INSERTING TIME ROW:")
+            print(e)
 
     # load user table
     #user_df = 
