@@ -5,7 +5,6 @@ from psycopg2 import Error
 import pandas as pd
 from sql_queries import *
 
-
 def process_song_file(cur, filepath):
     
     # open song file
@@ -15,26 +14,33 @@ def process_song_file(cur, filepath):
     # insert song record
     # FROM: https://knowledge.udacity.com/questions/97110
     # FROM: https://zetcode.com/python/psycopg2/
-    song_data = df[['song_id', 'title', 'artist_id', 'year', 'duration']].values[0].tolist()
-    # Try insercting the song data
-    try:
-        cur.execute(song_table_insert, song_data)
-    # Ensure the exectution of the insertion was succesful
-    except Error as e:
-        print(e)
+    for rIndex, row in df.iterrows():
         
-    # insert artist record
-    # FROM: https://knowledge.udacity.com/questions/97110
-    # FROM: https://zetcode.com/python/psycopg2/
-    # query = "INSERT INTO cars (id, name, price) VALUES (%s, %s, %s)"
-    # cur.executemany(query, cars)
-    artist_data = df[['artist_id', 'artist_name', 'artist_location','artist_latitude', 'artist_longitude']].values[0].lolist()
-    # Try insercting the artist data
-    try:
-        cur.execute(artist_table_insert, artist_data)
-    # Ensure the exectution of the insertion was succesful
-    except Error as e:
-        print(e)
+        # Get Song Data
+        song_data = df[['song_id', 'title', 'artist_id', 'year', 'duration']].values[rIndex].tolist()
+        # Try insercting the song data
+        try:
+            cur.execute(song_table_insert, song_data)
+        # Ensure the exectution of the insertion was succesful
+        except Error as e:
+            print(e)
+        
+        # insert artist record
+        # FROM: https://knowledge.udacity.com/questions/97110
+        # FROM: https://zetcode.com/python/psycopg2/
+        # query = "INSERT INTO cars (id, name, price) VALUES (%s, %s, %s)"
+        # cur.executemany(query, cars)
+        artist_data = df[['artist_id', 
+                          'artist_name', 
+                          'artist_location',
+                          'artist_latitude', 
+                          'artist_longitude']].values[rIndex].tolist()
+        # Try insercting the artist data
+        try:
+            cur.execute(artist_table_insert, artist_data)
+        # Ensure the exectution of the insertion was succesful
+        except Error as e:
+            print(e)
 
 def process_log_file(cur, filepath):
     # open log file
@@ -88,6 +94,11 @@ def process_log_file(cur, filepath):
         
         if results:
             songid, artistid = results
+            # Confirm what has been said here:
+            # https://knowledge.udacity.com/questions/142826
+            print ("--------------------------")
+            print ("FOUND AN ARIST AND SONG IT")
+            print ("--------------------------")
         else:
             songid, artistid = None, None
 
@@ -117,8 +128,11 @@ def process_data(cur, conn, filepath, func):
         conn.commit()
         print('{}/{} files processed.'.format(i, num_files))
 
-
 def main():
+    
+    import create_tables
+    create_tables.main()
+    
     conn = psycopg2.connect("host=127.0.0.1 dbname=sparkifydb user=student password=student")
     cur = conn.cursor()
 
