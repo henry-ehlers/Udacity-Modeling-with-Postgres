@@ -16,7 +16,12 @@ CREATE TABLE IF NOT EXISTS songplays (
 
 user_table_create = ("""
 CREATE TABLE IF NOT EXISTS users (
-    user_id int PRIMARY KEY
+    user_id int PRIMARY KEY, 
+    first_name varchar NOT NULL, 
+    last_name varchar NOT NULL, 
+    level varchar NOT NULL, 
+    gender varchar, 
+    location varchar
 );
 """)
 
@@ -60,6 +65,11 @@ songplay_table_insert = ("""
 """)
 
 user_table_insert = ("""
+INSERT INTO users
+    (user_id, first_name, last_name, level, gender, location)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    ON CONFLICT (user_id)
+        DO NOTHING;
 """)
 
 song_table_insert = ("""
