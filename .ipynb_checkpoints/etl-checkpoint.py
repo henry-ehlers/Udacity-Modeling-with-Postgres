@@ -51,7 +51,8 @@ def process_log_file(cur, filepath):
 
     # convert timestamp column to datetime
     # FROM: https://knowledge.udacity.com/questions/543309
-    t = pd.to_datetime(df['ts'], unit='ms')
+    df['ts'] = pd.to_datetime(df['ts'], unit='ms')
+    t = df.copy()
     
     # insert time data records
     # we have to data files (df and t), which are version of the same file
@@ -65,6 +66,7 @@ def process_log_file(cur, filepath):
         t.dt.year.values,
         t.dt.weekday.values
     ]
+    
     column_labels = ["start_time", "hour", "day", "week", "month", "year", "weekday"]
     time_df = pd.DataFrame(dict(zip(column_labels, time_data)))
 
